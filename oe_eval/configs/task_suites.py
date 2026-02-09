@@ -977,6 +977,79 @@ TASK_SUITE_CONFIGS["olmo3:base_easy:qa_rc"] = {
     "primary_metric": "macro",
 }
 
+TASK_SUITE_CONFIGS["bolmo1b"] = {
+    "tasks": {
+        "arc:rc::olmes:full",
+        "mmlu:rc::olmes",
+        "csqa:rc::olmes:full",
+        "hellaswag:rc::olmes:full",
+        "winogrande:rc::olmes:full",
+        "socialiqa:rc::olmes:full",
+        "piqa:rc::olmes:full",
+        "coqa:rc::gen2mc:xlarge",
+        "drop:rc::gen2mc:xlarge",
+        "jeopardy:rc::gen2mc:xlarge",
+        "naturalqs:rc::gen2mc:xlarge",
+        "squad:rc::gen2mc:xlarge",
+        "sciq:rc::olmo3",
+        "qasper_yesno:rc::olmes",
+        "basic_skills:rc::olmes",
+        "lab_bench_dbqa",
+        "lab_bench_protocolqa",
+        "lambada",
+        "medmcqa:rc::none",
+        "medqa_en:rc::none",
+        "sciriff_yesno:rc::olmes",
+    },
+    "primary_metric": "macro",
+}
+
+TASK_SUITE_CONFIGS["bolmo7b"] = {
+    "tasks": {
+        # Code tasks
+        "codex_humaneval:3shot::olmo3:n32:v2",
+        "mbpp:3shot::olmo3:n32:v2",
+        "bigcodebench:3shot::olmo3:v2",
+        "deepseek_leetcode::olmo3:n32:v2",
+        "ds1000:3shot::olmo3:v2",
+        "multipl_e_humaneval:6lang::olmo3:n32:v2",
+        "multipl_e_mbpp:6lang::olmo3:n32:v2",
+        # Math
+        "gsm8k::olmo3:n8:v2",
+        "minerva_math::olmes:n4:v2",
+        # STEM QA
+        "arc:mc::xlarge",
+        "mmlu_stem:mc::olmes",
+        "medmcqa:mc::none",
+        "medqa_en:mc::none",
+        "sciq:mc::xlarge",
+        # Non-STEM QA
+        "mmlu_humanities:mc::olmes",
+        "mmlu_social_sciences:mc::olmes",
+        "mmlu_other:mc::olmes",
+        "csqa:mc::xlarge",
+        "piqa:mc::xlarge",
+        "socialiqa:mc::xlarge",
+        "drop:mc::gen2mc:xlarge",
+        "jeopardy:mc::gen2mc:xlarge",
+        "naturalqs:mc::gen2mc:xlarge",
+        "squad:mc::gen2mc:xlarge",
+        "coqa:mc::gen2mc:xlarge",
+        "basic_skills:mc::olmes",
+        # GenQA
+        "hellaswag:rc::xlarge",
+        "winogrande:rc::xlarge",
+        "lambada",
+        "basic_skills:rc::olmes",
+        "drop::xlarge",
+        "jeopardy::xlarge",
+        "naturalqs::xlarge",
+        "squad::xlarge",
+        "coqa::xlarge",
+    },
+    "primary_metric": "macro",
+}
+
 TASK_SUITE_CONFIGS["olmo3:base_easy:qa_bpb"] = {
     "tasks": {
         "arc:rc:bpb::olmes:full",

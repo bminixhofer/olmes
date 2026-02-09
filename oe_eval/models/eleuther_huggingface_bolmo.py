@@ -91,6 +91,7 @@ class HFLM_Bolmo_Verbose(HFLM):
         )
         self.tokenizer_size = len(self.tokenizer)
         self.vocab_size_bolmo = 4 + 256 # 4 special tokens + 256 byte tokens
+        self.newline_id = self.tok_encode("\n")[-1]
 
     def unload_model(self):
         # Unload model from GPU, following advice in https://stackoverflow.com/questions/69357881
@@ -381,6 +382,9 @@ class HFLM_Bolmo_Verbose(HFLM):
                 # logits   1 2 3|4 5 6 7 8 9   <- the ctx half gets tossed out by the
                 # cont_toks      4 5 6 7 8 9      [:, -len(continuation_enc):, :self.vocab_size] slice
 
+                # NOTE(BOLMO): add newlines to the end to ensure one-byte-lookahead acts as expected (not clear if necessary)
+                continuation_enc = continuation_enc + [self.newline_id, self.newline_id]
+
                 # when too long to fit in context, truncate from the left
                 if self.AUTO_MODEL_CLASS == transformers.AutoModelForCausalLM:
                     inp = torch.tensor(
@@ -460,6 +464,8 @@ class HFLM_Bolmo_Verbose(HFLM):
                 chunk, multi_logits, inplens, cont_toks_list
             ):
                 # Slice to original seq length
+                # NOTE(BOLMO): remove the newline padding
+                cont_toks = cont_toks[: len(cont_toks) - 2]
                 contlen = len(cont_toks)
                 # take only logits in the continuation
                 # (discard context toks if decoder-only ; discard right-padding)
@@ -470,13 +476,15 @@ class HFLM_Bolmo_Verbose(HFLM):
                     if self.AUTO_MODEL_CLASS == transformers.AutoModelForCausalLM
                     else None
                 )
-                logits = self._select_cont_toks(logits, contlen=contlen, inplen=ctx_len)
+                # NOTE(BOLMO): remove \n padding
+                logits = self._select_cont_toks(logits, contlen=contlen, inplen=ctx_len - 2)
                 logits = logits.unsqueeze(0)  # [1, seq, vocab]
 
                 # NOTE(BOLMO): replace plain (single byte) logits with byte + boundary logits
                 probs = F.softmax(logits.float(), dim=-1)
                 probs[..., :self.vocab_size_bolmo] += probs[..., self.vocab_size_bolmo:self.vocab_size_bolmo*2]
                 logits = torch.log(probs)
+                logits[..., self.vocab_size_bolmo:self.vocab_size_bolmo*2] = -100_000
 
                 # Check if per-token argmax is exactly equal to continuation
                 greedy_tokens = logits.argmax(dim=-1)
